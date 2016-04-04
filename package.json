@@ -1,0 +1,13 @@
+{
+  "name": "indexer",
+  "version": "1.0.0",
+  "description": "indexer",
+  "main": "main.js",
+  "author": "ChoEun",
+  "license": "ISC",
+  "devDependencies": {
+    "glob": "^7.0.3",
+    "lodash": "^4.7.0",
+    "promise": "^7.1.1"
+  }
+}
