@@ -33,20 +33,57 @@ let getHTMLTitle = function(file) {
     })
 };
 
-let writeHTMLFiles = function(fileString) {
-    let htmlBody = '<!DOCTYPE html><html><head><title>Index</title><meta charset="UTF-8"></head><body><ul>' + fileString + "</ul></body></html>";
-    fs.writeFile('index.html', htmlBody, 'UTF-8', (err) => {})
+let writeHTMLFiles = function(fileTable) {
+    let sortedTable = _.sortBy(fileTable, function(o) { return o.directory });
+    let htmlString = '';
+    _.each(sortedTable, (obj) => {
+        let tdDirectory = '<td>' + obj.directory + '</td>';
+        let tdTitle = '<td><a href=' + obj.url + '>' + obj.title + '</a></td>';
+        let tdfileName = '<td><a href=' + obj.url + '>' + obj.fileName + '</a></td>';
+        let tdRow = '<tr>' + tdDirectory + tdTitle + tdfileName + '</tr>';
+        htmlString += tdRow;
+    });
+    let htmlBody = '<!DOCTYPE html>' +
+        '<html>' +
+        '<head>' +
+        '<meta charset="UTF-8">' +
+        '<title>INDEX</title>' +
+        '</head>' +
+        '<body>' +
+        '<table>' +
+        '<thead>' +
+        '<tr>' +
+        '<th>Directory</th>' +
+        '<th>Title</th>' +
+        '<th>fileName</th>' +
+        '</tr>' +
+        '</thead>' +
+        '<tbody>' + htmlString + '</tbody>' +
+        '</table>' +
+        '</body>' +
+        '</html>';
+
+    fs.writeFile('index.html', htmlBody);
 };
 
 getHTMLFiles.then((files) => {
-    let fileString = '';
+    let fileTable = [];
     _.eachRight(files, (data) => {
         getHTMLTitle(data).then((htmlTitle) => {
-            let listAnchorItem = '<li><a href=' + data + '>' + htmlTitle + '</a></li>';
-            fileString += listAnchorItem;
+            let parentPath = path.dirname(data).replace(dir, '');
+
+            let pathInfo = {
+                directory: parentPath,
+                url: data,
+                title: htmlTitle,
+                fileName: path.basename(data)
+            };
+
+            fileTable.push(pathInfo);
+
             files.pop();
             if(files.length === 0) {
-                writeHTMLFiles(fileString);
+                writeHTMLFiles(fileTable);
             }
         });
     })
